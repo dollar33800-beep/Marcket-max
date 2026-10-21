@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>NovaX — Pro Terminal</title>
-<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 :root{
   --bg:#000000;--card:#0e111a;--line:#1c2230;--txt:#ffffff;--muted:#6b7a90;
@@ -51,6 +50,9 @@ button{cursor:pointer}
 .m-change{font-size:11px;padding:4px 8px;border-radius:4px;margin-top:4px;display:inline-block;font-weight:600}
 .bg-up{background:rgba(14,203,129,0.1);color:var(--up)}
 .bg-down{background:rgba(246,70,93,0.1);color:var(--down)}
+.quick-buy{background:linear-gradient(135deg, #0ecb81, #059669);padding:16px;border-radius:12px;margin:0 16px 16px 16px;display:flex;justify-content:space-between;align-items:center;color:#fff;cursor:pointer}
+.quick-buy h3{margin:0;font-size:16px;font-weight:700}
+.quick-buy p{margin:4px 0 0 0;font-size:11px;opacity:0.9}
 
 /* Trade Screen */
 .trade-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -62,10 +64,12 @@ button{cursor:pointer}
 .tf-btn.active{background:#2b3139;color:var(--gold);border-color:#474d57}
 
 /* Chart Container */
-#tvchart{width:100%;height:350px;background:var(--bg)}
+#tvchart{width:100%;height:300px;background:var(--bg);position:relative}
+.chart-controls{position:absolute;right:10px;top:10px;display:flex;gap:5px;z-index:10}
+.chart-controls button{width:24px;height:24px;background:#1e2329;border-radius:4px;color:#fff;font-size:14px;display:flex;justify-content:center;align-items:center}
 
 /* Trade Controls */
-.trade-panel{padding:16px;background:var(--card);border-top:1px solid var(--line)}
+.trade-panel{padding:16px;background:var(--card);border-top:1px solid var(--line);margin-top:10px}
 .tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:12px}
 .tab{flex:1;text-align:center;padding:12px 0;font-size:14px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;transition:0.2s}
 .tab.active{color:var(--txt);border-bottom-color:var(--gold)}
@@ -85,20 +89,24 @@ button{cursor:pointer}
 .asset-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 16px}
 .a-btn{background:var(--card);border:1px solid var(--line);padding:16px 8px;border-radius:12px;text-align:center;font-size:11px;font-weight:600;color:var(--txt);cursor:pointer}
 .a-btn svg{width:24px;height:24px;fill:var(--txt);margin-bottom:6px}
+.account-list{padding:0 16px}
+.acc-item{background:var(--card);padding:16px;border-radius:12px;border:1px solid var(--line);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.acc-label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.acc-val{font-size:16px;font-weight:700}
 
 /* Modals */
 .modalBg{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(5px);display:none;justify-content:center;align-items:flex-end;z-index:200}
 .modalBg.on{display:flex;animation:fade 0.2s}
-.modal{background:var(--card);width:100%;max-width:500px;border-radius:20px 20px 0 0;padding:20px;animation:slideUp 0.3s ease}
+.modal{background:var(--card);width:100%;max-width:500px;border-radius:20px 20px 0 0;padding:20px;animation:slideUp 0.3s ease;max-height:90vh;overflow-y:auto}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
 .close-btn{color:var(--muted);font-size:24px;line-height:1}
 .warning-box{background:rgba(246,70,93,0.1);border:1px solid rgba(246,70,93,0.3);color:#f6465d;padding:12px;border-radius:8px;font-size:11px;margin-bottom:16px;line-height:1.4}
 .qr-box{background:#fff;padding:12px;border-radius:12px;width:fit-content;margin:0 auto 16px auto}
-.qr-box img{width:180px;height:180px;display:block}
+.qr-box img{width:160px;height:160px;display:block}
 .addr-box{background:#1e2329;border-radius:8px;padding:12px;margin-bottom:16px;word-break:break-all;font-family:monospace;font-size:12px;display:flex;justify-content:space-between;align-items:center;border:1px solid #2b3139}
-.copy-btn{color:var(--gold);font-weight:700;font-size:11px;padding:4px 8px;background:rgba(252,213,53,0.1);border-radius:4px}
-.countdown{font-size:28px;font-weight:800;text-align:center;color:var(--gold);font-family:monospace;margin:10px 0;letter-spacing:2px}
+.copy-btn{color:var(--gold);font-weight:700;font-size:11px;padding:4px 8px;background:rgba(252,213,53,0.1);border-radius:4px;cursor:pointer}
+.countdown{font-size:24px;font-weight:800;text-align:center;color:var(--gold);font-family:monospace;margin:10px 0;letter-spacing:1px}
 
 /* Support Chat */
 .support-float{position:fixed;bottom:80px;right:16px;width:50px;height:50px;background:var(--blue);border-radius:50%;display:flex;justify-content:center;align-items:center;box-shadow:0 4px 15px rgba(41,98,255,0.4);z-index:90;cursor:pointer}
@@ -112,25 +120,32 @@ button{cursor:pointer}
 .chat-opt{background:#2b3139;padding:6px 10px;border-radius:6px;font-size:11px;cursor:pointer;border:1px solid #474d57}
 .chat-opt:hover{background:#363c45}
 .btn-wa{background:#25d366;color:#fff;padding:10px;border-radius:8px;text-align:center;font-weight:700;font-size:13px;display:block;text-decoration:none;margin-top:8px}
+
+/* Login Form */
+.auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.authbox{width:100%;max-width:340px;background:var(--card);padding:24px;border-radius:16px;border:1px solid var(--line)}
+.authbox h2{text-align:center;margin:0 0 20px 0;font-size:24px;color:var(--blue)}
+.authbox input{width:100%;background:#1e2329;padding:14px;border-radius:8px;margin-bottom:12px;color:#fff;border:1px solid var(--line);font-size:14px}
+.authbox button{width:100%;background:var(--blue);padding:14px;border-radius:8px;font-weight:700;font-size:16px;color:#fff;margin-top:8px}
 </style>
 </head>
 <body>
 
 <!-- App Wrapper -->
-<div id="auth" class="hidden" style="display:flex;height:100vh;align-items:center;justify-content:center;">
-  <div style="width:100%;max-width:340px;padding:20px;">
-    <div style="font-size:28px;font-weight:800;text-align:center;margin-bottom:30px;">Nova<span style="color:var(--blue)">X</span></div>
+<div id="auth">
+  <div class="authbox">
+    <h2>NovaX</h2>
     <div id="loginForm">
-      <input id="le" type="email" placeholder="Email" style="width:100%;background:#1e2329;padding:14px;border-radius:8px;margin-bottom:12px;color:#fff;border:1px solid var(--line);">
-      <input id="lp" type="password" placeholder="Password" style="width:100%;background:#1e2329;padding:14px;border-radius:8px;margin-bottom:20px;color:#fff;border:1px solid var(--line);">
-      <button onclick="signIn()" style="width:100%;background:var(--blue);padding:14px;border-radius:8px;font-weight:700;font-size:16px;color:#fff;">Log In</button>
+      <input id="le" type="email" placeholder="Email">
+      <input id="lp" type="password" placeholder="Password">
+      <button onclick="signIn()">Log In</button>
       <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--muted);">No account? <span onclick="toggleAuth()" style="color:var(--gold);cursor:pointer;">Register</span></div>
     </div>
     <div id="registerForm" class="hidden">
-      <input id="rn" type="text" placeholder="Name" style="width:100%;background:#1e2329;padding:14px;border-radius:8px;margin-bottom:12px;color:#fff;border:1px solid var(--line);">
-      <input id="re" type="email" placeholder="Email" style="width:100%;background:#1e2329;padding:14px;border-radius:8px;margin-bottom:12px;color:#fff;border:1px solid var(--line);">
-      <input id="rp" type="password" placeholder="Password" style="width:100%;background:#1e2329;padding:14px;border-radius:8px;margin-bottom:20px;color:#fff;border:1px solid var(--line);">
-      <button onclick="register()" style="width:100%;background:var(--blue);padding:14px;border-radius:8px;font-weight:700;font-size:16px;color:#fff;">Create Account</button>
+      <input id="rn" type="text" placeholder="Name">
+      <input id="re" type="email" placeholder="Email">
+      <input id="rp" type="password" placeholder="Password">
+      <button onclick="register()">Create Account</button>
       <div style="text-align:center;margin-top:16px;font-size:13px;color:var(--muted);">Have account? <span onclick="toggleAuth()" style="color:var(--gold);cursor:pointer;">Log In</span></div>
     </div>
   </div>
@@ -148,27 +163,31 @@ button{cursor:pointer}
 
   <!-- HOME / MARKETS -->
   <section id="home" class="page active">
-    <div style="padding:16px;">
-      <h2 style="font-size:20px;margin-bottom:16px;">Markets</h2>
-      <div class="market-header"><span>Pair</span><span>Price / 24h Change</span></div>
-      <div class="market-list" id="homeMarkets"></div>
+    <div class="quick-buy" onclick="alert('Coming soon')">
+      <div>
+        <h3>Quickly buy coins</h3>
+        <p>Safe and convenient</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.2);width:36px;height:36px;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:20px;">→</div>
     </div>
+    <div class="market-header"><span>Pair</span><span>Price / 24h Change</span></div>
+    <div class="market-list" id="homeMarkets"></div>
   </section>
 
   <!-- TRADE -->
   <section id="trade" class="page">
     <div class="trade-header">
       <div>
-        <span class="trade-title" id="tradePair">BTCUSDT</span>
+        <span class="trade-title" id="tradePair">BTC/USDT</span>
         <span class="trade-change" id="tradeChange">+0.00%</span>
       </div>
       <div style="font-size:20px;color:var(--muted);">⚙</div>
     </div>
     
     <div class="tf-scroll" id="tfTabs">
-      <button class="tf-btn active" onclick="setTF('1m',this)">1m</button>
-      <button class="tf-btn" onclick="setTF('3m',this)">3m</button>
-      <button class="tf-btn" onclick="setTF('5m',this)">5m</button>
+      <button class="tf-btn" onclick="setTF('1m',this)">60s</button>
+      <button class="tf-btn" onclick="setTF('3m',this)">120s</button>
+      <button class="tf-btn active" onclick="setTF('5m',this)">5m</button>
       <button class="tf-btn" onclick="setTF('15m',this)">15m</button>
       <button class="tf-btn" onclick="setTF('30m',this)">30m</button>
       <button class="tf-btn" onclick="setTF('1h',this)">1h</button>
@@ -177,12 +196,18 @@ button{cursor:pointer}
       <button class="tf-btn" onclick="setTF('1M',this)">1M</button>
     </div>
 
-    <div id="tvchart"></div>
+    <div id="tvchart">
+      <div class="chart-controls">
+        <button onclick="zoomChart(1.2)">+</button>
+        <button onclick="zoomChart(0.8)">-</button>
+      </div>
+      <canvas id="chartCanvas"></canvas>
+    </div>
 
     <div class="trade-panel">
       <div class="tabs">
-        <div class="tab active">Trade</div>
-        <div class="tab" id="inviteTabBtn">Invite</div>
+        <div class="tab active" onclick="switchTradeTab('trade', this)">Self Trade</div>
+        <div class="tab" onclick="switchTradeTab('invite', this)">Invite</div>
       </div>
       
       <div id="tradeForm">
@@ -191,8 +216,8 @@ button{cursor:pointer}
           <span>USDT</span>
         </div>
         <div class="dir-btns">
-          <button class="btn-buy" onclick="placeTrade('up')">BUY / CALL</button>
-          <button class="btn-sell" onclick="placeTrade('down')">SELL / PUT</button>
+          <button class="btn-buy" onclick="placeTrade('up')">▲ CALL</button>
+          <button class="btn-sell" onclick="placeTrade('down')">▼ PUT</button>
         </div>
       </div>
       
@@ -210,7 +235,7 @@ button{cursor:pointer}
     <div style="padding:16px 16px 0 16px;font-size:18px;font-weight:700;">Assets</div>
     
     <div class="assets-card">
-      <div class="assets-label"><span>Total Balance</span> <span>👁</span></div>
+      <div class="assets-label"><span>Total Assets</span> <span>👁</span></div>
       <div class="assets-amt" id="walletBal">0.00</div>
       <div class="assets-sub">Today's PnL: 0.00 USDT</div>
     </div>
@@ -233,6 +258,31 @@ button{cursor:pointer}
         History
       </div>
     </div>
+
+    <div style="padding:0 16px;font-size:16px;font-weight:700;margin-bottom:10px;">My account</div>
+    <div class="account-list">
+      <div class="acc-item" onclick="alert('No funds in Exchange')">
+        <div>
+          <div class="acc-label">Exchange</div>
+          <div class="acc-val">0.00</div>
+        </div>
+        <div style="color:var(--muted);">›</div>
+      </div>
+      <div class="acc-item" onclick="go('trade')">
+        <div>
+          <div class="acc-label">Trade</div>
+          <div class="acc-val" id="accTradeBal">0.00</div>
+        </div>
+        <div style="color:var(--muted);">›</div>
+      </div>
+      <div class="acc-item" onclick="alert('No Perpetual balance')">
+        <div>
+          <div class="acc-label">Perpetual</div>
+          <div class="acc-val">0.00</div>
+        </div>
+        <div style="color:var(--muted);">›</div>
+      </div>
+    </div>
   </section>
 
   <!-- HISTORY -->
@@ -243,7 +293,7 @@ button{cursor:pointer}
     </div>
   </section>
 
-  <!-- ADMIN (Hidden from normal users) -->
+  <!-- ADMIN -->
   <section id="admin" class="page">
     <div style="padding:16px;">
       <h2 style="color:var(--gold);margin-bottom:16px;">Admin Panel</h2>
@@ -287,7 +337,7 @@ button{cursor:pointer}
     <button class="navbtn" onclick="go('history', this)" data-p="history">
       <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>History
     </button>
-    <button class="navbtn" id="navAdminBtn" class="hidden" onclick="go('admin', this)" data-p="admin">
+    <button class="navbtn hidden" id="navAdminBtn" onclick="go('admin', this)" data-p="admin">
       <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>Admin
     </button>
   </nav>
@@ -332,12 +382,13 @@ const ADDRESSES = {
 const SYMBOLS = ["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT","ADAUSDT","DOGEUSDT","AVAXUSDT","LINKUSDT","TONUSDT","DOTUSDT","MATICUSDT","SHIBUSDT","LTCUSDT","TRXUSDT","UNIUSDT","ATOMUSDT","ETCUSDT","XLMUSDT","BCHUSDT","FILUSDT","NEARUSDT","APTUSDT","ARBUSDT","OPUSDT","INJUSDT","SUIUSDT","SEIUSDT","TIAUSDT","RNDRUSDT","FETUSDT","PEPEUSDT","WIFUSDT","ORDIUSDT","JUPUSDT","STRKUSDT","WLDUSDT","BONKUSDT","FLOKIUSDT","GALAUSDT"];
 
 /* ================= STATE ================= */
-const KEY = "novax_pro_v1";
+const KEY = "novax_pro_v2";
 let DB = loadDB();
 let session = null;
-let coin = "BTCUSDT", interval = "1m", ticker = {};
-let chart = null, candleSeries = null;
+let coin = "BTCUSDT", interval = "5m", ticker = {};
 let currentPrice = 0;
+let chartData = [];
+let chartZoom = 1;
 
 const $ = id => document.getElementById(id);
 
@@ -384,8 +435,8 @@ function enter(){
   if(u.role==="admin"){ $("navAdminBtn").classList.remove("hidden"); } else { $("navAdminBtn").classList.add("hidden"); }
   
   renderAll(); startMarket();
-  if(u.role==="admin") go('admin');
-  else go('home');
+  if(u.role==="admin") go('admin', $("navAdminBtn"));
+  else go('home', document.querySelector('.navbtn[data-p="home"]'));
 }
 
 function logout(){ session=null; DB.sessionEmail=null; saveDB(); $("app").classList.add("hidden"); $("auth").classList.remove("hidden"); }
@@ -397,7 +448,7 @@ function go(id, btn){
   document.querySelectorAll(".navbtn").forEach(x=>x.classList.remove("active"));
   if(btn) btn.classList.add("active");
   
-  if(id==="trade"){ setTimeout(()=>{ if(chart) chart.resize($("tvchart").clientWidth, 350); loadChart(); }, 50); }
+  if(id==="trade"){ setTimeout(()=>{ loadChart(); }, 50); }
   if(id==="home") renderMarkets();
   if(id==="wallet") renderWallet();
   if(id==="history") renderHistory();
@@ -409,6 +460,7 @@ function renderAll(){
   const u = me(); if(!u) return;
   $("userBalTop").textContent = (u.balance||0).toFixed(2) + " USDT";
   $("walletBal").textContent = (u.balance||0).toFixed(2);
+  $("accTradeBal").textContent = (u.balance||0).toFixed(2);
   renderMarkets(); renderHistory(); renderWallet(); renderAdmin();
 }
 
@@ -434,6 +486,7 @@ function renderMarkets(){
 function renderWallet(){
   const u = me(); if(!u) return;
   $("walletBal").textContent = (u.balance||0).toFixed(2);
+  $("accTradeBal").textContent = (u.balance||0).toFixed(2);
 }
 
 function renderHistory(){
@@ -486,7 +539,10 @@ async function loadTicker(){
     renderMarkets();
     if($("trade").classList.contains("active")){
        const t = ticker[coin];
-       if(t){ $("tradeChange").textContent = (t.priceChangePercent>=0?"+":"") + (+t.priceChangePercent).toFixed(2) + "%"; $("tradeChange").style.color = t.priceChangePercent>=0 ? "var(--up)" : "var(--down)"; }
+       if(t){ 
+         $("tradeChange").textContent = (t.priceChangePercent>=0?"+":"") + (+t.priceChangePercent).toFixed(2) + "%"; 
+         $("tradeChange").style.color = t.priceChangePercent>=0 ? "var(--up)" : "var(--down)"; 
+       }
     }
   }catch(e){}
 }
@@ -494,28 +550,11 @@ async function loadTicker(){
 function openTrade(sym){
   coin = sym;
   go('trade', document.querySelector('.navbtn[data-p="trade"]'));
-  $("tradePair").textContent = sym;
+  $("tradePair").textContent = sym.replace("USDT","/USDT");
   loadChart();
 }
 
-/* ================= CHART ================= */
-function initChart(){
-  const el = $("tvchart");
-  el.innerHTML = "";
-  chart = LightweightCharts.createChart(el, {
-    width: el.clientWidth, height: 350,
-    layout: { background: { type: 'solid', color: '#000000' }, textColor: '#6b7a90' },
-    grid: { vertLines: { color: '#121620' }, horzLines: { color: '#121620' } },
-    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-    rightPriceScale: { borderColor: '#1c2230' },
-    timeScale: { borderColor: '#1c2230', timeVisible: true, secondsVisible: false }
-  });
-  candleSeries = chart.addCandlestickSeries({
-    upColor: '#0ecb81', downColor: '#f6465d', borderVisible: false,
-    wickUpColor: '#0ecb81', wickDownColor: '#f6465d'
-  });
-}
-
+/* ================= CHART (Canvas) ================= */
 function setTF(tf, btn){
   interval = tf;
   document.querySelectorAll(".tf-btn").forEach(x=>x.classList.remove("active"));
@@ -523,28 +562,110 @@ function setTF(tf, btn){
   loadChart();
 }
 
+function zoomChart(mult){
+  chartZoom *= mult;
+  if(chartZoom < 0.5) chartZoom = 0.5;
+  if(chartZoom > 3) chartZoom = 3;
+  drawChart();
+}
+
 async function loadChart(){
   if(!$("trade").classList.contains("active")) return;
   try{
-    const d = await api(`https://data-api.binance.vision/api/v3/klines?symbol=${coin}&interval=${interval}&limit=120`);
-    const cdata = d.map(x=> ({
-      time: x[0]/1000,
+    const d = await api(`https://data-api.binance.vision/api/v3/klines?symbol=${coin}&interval=${interval}&limit=100`);
+    chartData = d.map(x=> ({
+      time: x[0],
       open: +x[1], high: +x[2], low: +x[3], close: +x[4]
     }));
-    if(candleSeries){
-      candleSeries.setData(cdata);
-      currentPrice = cdata[cdata.length-1].close;
-    }
+    currentPrice = chartData[chartData.length-1].close;
+    drawChart();
   }catch(e){}
+}
+
+function drawChart(){
+  const canvas = $("chartCanvas");
+  if(!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  
+  canvas.width = rect.width * ratio;
+  canvas.height = rect.height * ratio;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = rect.height + 'px';
+  ctx.scale(ratio, ratio);
+  
+  const W = rect.width, H = rect.height;
+  ctx.clearRect(0, 0, W, H);
+  
+  if(chartData.length === 0) return;
+  
+  const shown = Math.floor(chartData.length / chartZoom);
+  const start = chartData.length - shown;
+  const visible = chartData.slice(start);
+  
+  let min = Infinity, max = -Infinity;
+  visible.forEach(c => { if(c.low < min) min = c.low; if(c.high > max) max = c.high; });
+  const range = (max - min) || 1;
+  
+  const padTop = 20, padBot = 20, padRight = 60;
+  const chartH = H - padTop - padBot;
+  const chartW = W - padRight;
+  
+  // Grid
+  ctx.strokeStyle = "#1c2230"; ctx.lineWidth = 1;
+  for(let i=0;i<=4;i++){
+    const y = padTop + i*chartH/4;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(chartW,y); ctx.stroke();
+  }
+  
+  const step = chartW / visible.length;
+  const candleW = Math.max(2, step * 0.7);
+  
+  visible.forEach((c, i) => {
+    const x = i * step + step/2;
+    const yO = padTop + (max - c.open)/range * chartH;
+    const yC = padTop + (max - c.close)/range * chartH;
+    const yH = padTop + (max - c.high)/range * chartH;
+    const yL = padTop + (max - c.low)/range * chartH;
+    const up = c.close >= c.open;
+    const color = up ? "#0ecb81" : "#f6465d";
+    
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, yH); ctx.lineTo(x, yL); ctx.stroke();
+    
+    ctx.fillStyle = color;
+    const top = Math.min(yO, yC);
+    const h = Math.max(1, Math.abs(yC - yO));
+    ctx.fillRect(x - candleW/2, top, candleW, h);
+  });
+  
+  // Current price line
+  const yLast = padTop + (max - currentPrice)/range * chartH;
+  ctx.strokeStyle = currentPrice >= chartData[0].open ? "#0ecb81" : "#f6465d";
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(0, yLast); ctx.lineTo(chartW, yLast); ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // Axis labels
+  ctx.fillStyle = "#6b7a90";
+  ctx.font = "10px sans-serif";
+  ctx.fillText(fmt(max), chartW + 5, padTop + 10);
+  ctx.fillText(fmt(min), chartW + 5, H - padBot);
+  
+  // Last price badge
+  ctx.fillStyle = currentPrice >= chartData[0].open ? "#0ecb81" : "#f6465d";
+  ctx.fillRect(chartW, yLast - 10, padRight, 20);
+  ctx.fillStyle = "#000";
+  ctx.font = "bold 10px sans-serif";
+  ctx.fillText(fmt(currentPrice), chartW + 5, yLast + 4);
 }
 
 /* ================= DEPOSIT / WITHDRAW ================= */
 function openModal(type){
-  if(type === 'deposit'){
-    openDeposit();
-  } else if(type === 'withdraw'){
-    openWithdraw();
-  }
+  if(type === 'deposit') openDeposit();
+  else if(type === 'withdraw') openWithdraw();
 }
 
 function openDeposit(){
@@ -604,7 +725,7 @@ function submitDeposit(){
     amount:amt, network:net, status:"Pending", created:Date.now()
   });
   saveDB(); closeModal(); renderAdmin();
-  toast("Deposit request submitted. Wait for admin approval.");
+  toast("Deposit request submitted.");
 }
 
 function openWithdraw(){
@@ -622,7 +743,7 @@ function openWithdraw(){
     </select>
     
     <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Destination Address</div>
-    <input id="wdAddr" placeholder="Paste your wallet address" style="width:100%;background:#1e2329;padding:14px;border-radius:8px;color:#fff;border:1px solid var(--line);margin-bottom:16px;">
+    <input id="wdAddr" placeholder="Paste your wallet address" style="width:100%;background:#1e2329;padding:14px;border-radius:8px;color:#fff;border:1px solid var(--line);margin-bottom:16px;font-size:13px;">
     
     <button class="btn-sell" style="width:100%;" onclick="submitWithdraw()">Request Withdrawal</button>
   `;
@@ -646,12 +767,24 @@ function submitWithdraw(){
     amount:amt, network:net, address:addr, status:"Pending", created:Date.now()
   });
   saveDB(); closeModal(); renderAll();
-  toast("Withdrawal request submitted.");
+  toast("Withdrawal requested.");
 }
 
 function closeModal(){ $("modalBg").classList.remove("on"); }
 
 /* ================= TRADE ================= */
+function switchTradeTab(type, el){
+  document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  if(type==='trade'){
+    $("tradeForm").classList.remove("hidden");
+    $("inviteForm").classList.add("hidden");
+  } else {
+    $("tradeForm").classList.add("hidden");
+    $("inviteForm").classList.remove("hidden");
+  }
+}
+
 function placeTrade(dir){
   const u = me();
   const amt = +$("tradeAmt").value;
@@ -666,21 +799,8 @@ function placeTrade(dir){
     status:"Open", profitPct:0
   });
   saveDB(); renderAll();
-  toast(`Trade placed: ${dir.toUpperCase()} ${amt} USDT`);
+  toast(`Trade placed: ${dir.toUpperCase()}`);
 }
-
-document.getElementById('inviteTabBtn').onclick = ()=>{
-  document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.remove('active'));
-  document.getElementById('inviteTabBtn').classList.add('active');
-  document.getElementById('tradeForm').classList.add('hidden');
-  document.getElementById('inviteForm').classList.remove('hidden');
-};
-document.querySelector('.tabs .tab').onclick = function(){
-  document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.remove('active'));
-  this.classList.add('active');
-  document.getElementById('inviteForm').classList.add('hidden');
-  document.getElementById('tradeForm').classList.remove('hidden');
-};
 
 function doInviteTrade(){
   const code = $("inviteCode").value.trim().toUpperCase();
@@ -689,16 +809,17 @@ function doInviteTrade(){
   const c = DB.codes.find(x=>x.code===code && !x.used);
   if(!c) return toast("Invalid or used code.");
   
-  // Invite logic: 15 min trade based on current balance percentage
+  if(u.balance < 7) return toast("Minimum 7 USDT required for Invite Trade.");
+  
   u.trades = u.trades || [];
   u.trades.unshift({
     id:"IV"+Date.now().toString().slice(-6),
-    amount:0, dir:null, time:Date.now(), closeAt:Date.now()+15*60000,
+    amount:7, dir:null, time:Date.now(), closeAt:Date.now()+15*60000,
     status:"Open", profitPct: c.pct, invite:true
   });
   c.used = true; c.usedBy = u.email;
   saveDB(); renderAll();
-  toast("Invite trade placed successfully.");
+  toast("Invite trade placed.");
   $("inviteCode").value="";
 }
 
@@ -709,15 +830,12 @@ function checkTrades(){
     if(t.status==="Open" && Date.now() >= t.closeAt){
       t.status = "Completed";
       if(t.invite){
-        // Profit = balance * pct
         const profit = (u.balance * t.profitPct) / 100;
         u.balance += profit;
-        t.amount = profit; // showing profit
+        t.amount = profit;
       } else {
-        // 50/50 simulation
         const win = Math.random() < 0.5;
-        if(win){ u.balance += t.amount * 1.85; t.profit = t.amount * 0.85; }
-        else{ t.profit = -t.amount; }
+        if(win){ u.balance += t.amount * 1.85; }
       }
       changed = true;
     }
@@ -768,7 +886,7 @@ function appDep(email, id){
   const u = DB.users.find(x=>x.email===email);
   const r = (u.depsReq||[]).find(x=>x.id===id);
   if(!r) return; r.status="Approved";
-  u.balance += r.amount; saveDB(); renderAdmin(); renderAll(); toast("Approved");
+  u.balance += r.amount; saveDB(); renderAdmin(); renderAll(); toast("Deposit Approved");
 }
 function rejDep(email, id){
   const u = DB.users.find(x=>x.email===email);
@@ -792,18 +910,18 @@ function genCode(){
   const code = "NX" + Math.random().toString(36).slice(2,7).toUpperCase();
   DB.codes = DB.codes || [];
   DB.codes.unshift({code, pct, used:false});
-  saveDB(); toast("Code: " + code);
+  saveDB(); toast("Code Generated");
   $("admCodePct").value = "";
-  alert("Profit Code Generated: " + code + "\nProfit: " + pct + "%");
+  alert("Profit Code: " + code + "\nProfit: " + pct + "%");
 }
 
 /* ================= SUPPORT AI ================= */
 const chatData = {
-  trade: "For trading issues: 1. Ensure you have sufficient balance. 2. If chart is not loading, check your internet. 3. Trades auto-close in 15 minutes. Wait for the timer to finish.",
-  deposit: "For deposits: 1. Always select the correct network (TRC20/ERC20/BEP20). 2. Send the exact amount to the address shown. 3. Click 'I Have Paid' after sending. 4. Wait for admin approval (usually 5-30 mins).",
-  withdraw: "For withdrawals: 1. Enter the correct wallet address. 2. Select the correct network. 3. Requests are processed within 24 hours. Make sure your balance is sufficient.",
-  market: "Market data is live from Binance. If prices aren't updating, try refreshing the page or checking your connection.",
-  account: "For account issues: If you forgot your password, please contact human support. Your data is stored locally in your browser.",
+  trade: "For trading issues: 1. Ensure you have sufficient balance. 2. If chart is not loading, check your internet. 3. Trades auto-close in 15 minutes.",
+  deposit: "For deposits: 1. Select correct network (TRC20/ERC20/BEP20). 2. Send exact amount. 3. Click 'I Have Paid'. 4. Wait for admin approval.",
+  withdraw: "For withdrawals: 1. Enter correct wallet address. 2. Select correct network. 3. Requests processed within 24 hours.",
+  market: "Market data is live from Binance. If prices aren't updating, try refreshing the page.",
+  account: "For account issues: If you forgot password, contact human support. Data stored locally in browser.",
   other: "Please describe your issue to human support via WhatsApp for faster resolution."
 };
 
@@ -813,7 +931,7 @@ function toggleChat(){
   else {
     c.classList.add("on");
     $("chatBody").innerHTML = `<div class="chat-msg">Hello! How can I help you today? Please select your issue:</div>
-    <div class="chat-options" id="chatOpts">
+    <div class="chat-options">
       <div class="chat-opt" onclick="chatSelect('trade')">Trade</div>
       <div class="chat-opt" onclick="chatSelect('deposit')">Deposit</div>
       <div class="chat-opt" onclick="chatSelect('withdraw')">Withdrawal</div>
@@ -853,8 +971,7 @@ if(DB.sessionEmail){
   const u = DB.users.find(x=>x.email===DB.sessionEmail);
   if(u){ session = DB.sessionEmail; enter(); }
 }
-window.addEventListener("resize", ()=>{ if(chart && $("trade").classList.contains("active")) chart.resize($("tvchart").clientWidth, 350); });
-setTimeout(initChart, 500);
+window.addEventListener("resize", ()=>{ if($("trade").classList.contains("active")) drawChart(); });
 </script>
 </body>
 </html>
